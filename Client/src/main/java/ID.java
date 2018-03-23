@@ -15,6 +15,10 @@ public class ID {
         this.github = github;
     }
 
+    public ID(){
+
+    }
+
     public String getUserid() {
         return userid;
     }

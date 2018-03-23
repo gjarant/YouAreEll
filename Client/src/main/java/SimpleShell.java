@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SimpleShell {
 
@@ -25,9 +27,13 @@ public class SimpleShell {
         //we break out with <ctrl c>
         while (true) {
             //read what the user enters
-            System.out.println("cmd? ");
+            System.out.println("What would you like to do? ids| messages| post-id| post-message| my-messages| my-messages-from-friend| exit");
             commandLine = console.readLine();
 
+//            if(commandLine.equals("help")){
+//                System.out.println("history\t\t\tids\t\t\tmessages\nmessage-log\t\tPOST-id\t\tPOST-message\n");
+//                continue;
+//            }
             //input parsed into array of strings(command and arguments)
             String[] commands = commandLine.split(" ");
             List<String> list = new ArrayList<String>();
@@ -60,18 +66,55 @@ public class SimpleShell {
 
                 // ids
                 if (list.contains("ids")) {
-                    String results = webber.get_ids();
+                    String results = webber.idParse();
                     SimpleShell.prettyPrint(results);
                     continue;
                 }
 
                 // messages
                 if (list.contains("messages")) {
-                    String results = webber.get_messages();
+                    String results = webber.messageParse();
+                    SimpleShell.prettyPrint(results);
+                    continue;
+                }
+                if (list.contains("my-messages")) {
+                    System.out.println("What is your GitHub User Id?");
+                    String yourGitID = console.readLine();
+                    String results = webber.myMessageParse(yourGitID);
+                    SimpleShell.prettyPrint(results);
+                    continue;
+                }
+                if (list.contains("my-messages-from-friend")) {
+                    System.out.println("What is your GitHub User Id?");
+                    String yourGitID = console.readLine();
+                    System.out.println("What is your Friend's GitHub User Id?");
+                    String friendGitID = console.readLine();
+                    String results = webber.myMessageParseFromFriend(yourGitID, friendGitID);
                     SimpleShell.prettyPrint(results);
                     continue;
                 }
                 // you need to add a bunch more.
+                if (list.contains("post-id")) {
+                    System.out.println("What is your name?");
+                    String name = console.readLine();;
+                    System.out.println("What is your GitHub ID?");
+                    String gitID = console.readLine();;
+                    webber.postID(name, gitID);
+                    System.out.println("Your Github ID has been posted");
+                    continue;
+
+                }
+                if(list.contains("post-message")){
+                    System.out.println("What is your GitHub User Id?");
+                    String fromGitID = console.readLine();
+                    System.out.println("Who are you sending the message to?");
+                    String toGitID = console.readLine();
+                    System.out.println("What is your message?");
+                    String message = console.readLine();
+                    webber.postMessage(fromGitID, toGitID, message);
+                    System.out.println("Your message has been posted");
+                    continue;
+                }
 
                 //!! command returns the last command in history
                 if (list.get(list.size() - 1).equals("!!")) {
